@@ -58,7 +58,7 @@ def web_socket_data_frame_recv_processor(con):
 			raw_str = ""
 			i=0
 			for d in pData:
-				raw_str+=chr(ord(d) ^ ord(masks[i%4]))
+				raw_str+=chr(ord(d) ^ ord(masks[i%4])) # chr(Number) 取 ANSCII (0~255), 基本上在組 Bytes
 				i+=1
 			print raw_str.decode('utf-8')
 
