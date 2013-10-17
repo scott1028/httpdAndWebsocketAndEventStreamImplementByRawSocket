@@ -33,21 +33,21 @@ def web_socket_processor(con):
 		else:
 			# 將 Bytes 或 String 轉換為 16 進為編碼文字
 			print data.encode('hex')
-			# Payload Size
-			print int(data[1].encode('hex'),16) & 0b01111111
 
-			print len(data)
-			if (int(data[1].encode('hex'),16) & 0b01111111) == 126:
+			# Payload Size
+			payloadSize=int(data[1].encode('hex'),16) & 0b01111111
+			print payloadSize,len(data)
+			if payloadSize == 126:
 				masks = data[4:8]
 				pData = data[8:]
-			elif (int(data[1].encode('hex'),16) & 0b01111111) == 127:
+			elif payloadSize == 127:
 				masks = data[10:14]
 				pData = data[14:]
 			else:
 				masks = data[2:6]
 				pData = data[6:]
 			
-			# 使用 Mask 解析出文字
+			# 使用 Mask 解析出文字, ord() 取一個Byte的 ANSCII 十進位
 			raw_str = ""
 			i=0
 			for d in pData:
