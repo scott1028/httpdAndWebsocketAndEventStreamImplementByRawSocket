@@ -3,7 +3,7 @@
 
 import socket,re,sys
 import hashlib,base64
-import threading
+import threading,binascii
 
 def web_socket_handle(con):
 	# WebSocket Handle
@@ -27,11 +27,13 @@ def web_socket_handle(con):
 def web_socket_processor(con):
 	while True:
 		data=con.recv(1024)
-		print data
+		print len(data)
+		print data.encode('hex')	# 將 Bytes 或 String 轉換為 16 進為編碼文字
+		if(len(data)==0):break	# 當 Client 斷線的時候, con.recv(1024) 會 non-blocking 並返回 nil
 	con.close() # WebSocket 不關閉
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
-sock.bind(("", 80))  
+sock.bind(("", 80))
 sock.listen(10)
 
 while True:
