@@ -27,9 +27,34 @@ def web_socket_handle(con):
 def web_socket_processor(con):
 	while True:
 		data=con.recv(1024)
-		print len(data)
-		print data.encode('hex')	# 將 Bytes 或 String 轉換為 16 進為編碼文字
-		if(len(data)==0):break	# 當 Client 斷線的時候, con.recv(1024) 會 non-blocking 並返回 nil
+		if(len(data)==0):
+			# 當 Client 斷線的時候, con.recv(1024) 會 non-blocking 並返回 nil
+			break
+		else:
+			# 將 Bytes 或 String 轉換為 16 進為編碼文字
+			print data.encode('hex')
+			# Payload Size
+			print int(data[1].encode('hex'),16) & 0b01111111
+
+			print len(data)
+			if (int(data[1].encode('hex'),16) & 0b01111111) == 126:
+				masks = data[4:8]
+				pData = data[8:]
+			elif (int(data[1].encode('hex'),16) & 0b01111111) == 127:
+				masks = data[10:14]
+				pData = data[14:]
+			else:
+				masks = data[2:6]
+				pData = data[6:]
+			
+			# 使用 Mask 解析出文字
+			raw_str = ""
+			i=0
+			for d in pData:
+				raw_str+=chr(ord(d) ^ ord(masks[i%4]))
+				i+=1
+			print raw_str.decode('utf-8')
+
 	con.close() # WebSocket 不關閉
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
