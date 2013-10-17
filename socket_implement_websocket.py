@@ -24,9 +24,11 @@ def web_socket_handle(con):
 	con.send('Sec-WebSocket-Origin: null\r\n')
 	con.send('Sec-WebSocket-Location: ws://'+host+'/\r\n\r\n')
 
-def web_socket_processor(con):
+# 處裡接收資料
+def web_socket_data_frame_recv_processor(con):
 	while True:
-		data=con.recv(1024)
+		# 讓 Buffer 大一點可以一次處裡比較大的 Client Send Data Frame, Python 最大也只能到 32768 Bytes
+		data=con.recv(32768)
 		if(len(data)==0):
 			# 當 Client 斷線的時候, con.recv(1024) 會 non-blocking 並返回 nil
 			break
@@ -54,8 +56,11 @@ def web_socket_processor(con):
 				raw_str+=chr(ord(d) ^ ord(masks[i%4]))
 				i+=1
 			print raw_str.decode('utf-8')
-
 	con.close() # WebSocket 不關閉
+
+# 處理發送資料
+def web_socket_data_frame_send_processor(con):
+	pass
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 sock.bind(("", 80))
@@ -73,7 +78,7 @@ while True:
 		web_socket_handle(con)
 
 		# 建立一個 Thread 來處理這個 WebSocket 以免被下一個連線變數名稱給取代了
-		threading.Thread(target=web_socket_processor,args=(con,)).start()
+		threading.Thread(target=web_socket_data_frame_recv_processor,args=(con,)).start()
 	except:
 		pass
 
