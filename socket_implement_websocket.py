@@ -5,6 +5,7 @@ import socket,re,sys
 import hashlib,base64
 import threading,binascii
 import struct
+import time
 
 def web_socket_handle(con):
 	# WebSocket Handle
@@ -27,6 +28,9 @@ def web_socket_handle(con):
 
 # 處裡接收資料
 def web_socket_data_frame_recv_processor(con):
+	# 先啟動一個回應中心
+	threading.Thread(target=server_push_processor,args=(con,)).start()
+
 	while True:
 		# 讓 Buffer 大一點可以一次處裡比較大的 Client Send Data Frame, Python 最大也只能到 32768 Bytes
 		data=con.recv(32768)
@@ -58,9 +62,6 @@ def web_socket_data_frame_recv_processor(con):
 				i+=1
 			print raw_str.decode('utf-8')
 
-			# 回應
-			web_socket_data_frame_send_processor('我收到了!',con)
-
 	con.close() # WebSocket 不關閉
 
 # 處理發送資料
@@ -80,6 +81,12 @@ def web_socket_data_frame_send_processor(pData,con):
 	pData = '%s%s' % (token,pData)
 	con.send(pData)
 	return True
+
+# Server Push Center
+def server_push_processor(con):
+	while True:
+		web_socket_data_frame_send_processor('我收到了!',con)
+		time.sleep(1)
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 sock.bind(("", 80))
