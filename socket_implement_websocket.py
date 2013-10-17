@@ -4,6 +4,7 @@
 import socket,re,sys
 import hashlib,base64
 import threading,binascii
+import struct
 
 def web_socket_handle(con):
 	# WebSocket Handle
@@ -56,11 +57,29 @@ def web_socket_data_frame_recv_processor(con):
 				raw_str+=chr(ord(d) ^ ord(masks[i%4]))
 				i+=1
 			print raw_str.decode('utf-8')
+
+			# 回應
+			web_socket_data_frame_send_processor('我收到了!',con)
+
 	con.close() # WebSocket 不關閉
 
 # 處理發送資料
-def web_socket_data_frame_send_processor(con):
-	pass
+def web_socket_data_frame_send_processor(pData,con):
+	if(pData == False):
+		return False
+	else:
+		pData = str(pData)  
+	token = "\x81"
+	length = len(pData)
+	if length < 126:
+		token += struct.pack("B", length)
+	elif length <= 0xFFFF:
+		token += struct.pack("!BH", 126, length)
+	else:
+		token += struct.pack("!BQ", 127, length)
+	pData = '%s%s' % (token,pData)
+	con.send(pData)
+	return True
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 sock.bind(("", 80))
