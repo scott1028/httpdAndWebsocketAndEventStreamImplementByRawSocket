@@ -44,14 +44,14 @@ def web_socket_data_frame_recv_processor(con):
 			# Payload Size
 			payloadSize=int(data[1].encode('hex'),16) & 0b01111111
 			print payloadSize,len(data)
-			if payloadSize == 126:
-				masks = data[4:8]
+			if payloadSize == 126:			# 126 bytes 至 65535 bytes：會以「111 1110」即「126」表示，並指示下兩個 byte 才載有實際的內容長度
+				masks = data[4:8]			# 簡單來說就是 Payload Len 將延長 2 個 Byte ( ...|payload size|extend payload length 2 Bytes|... )
 				pData = data[8:]
-			elif payloadSize == 127:
-				masks = data[10:14]
+			elif payloadSize == 127:		# 65536 bytes 至 2^64 - 1 bytes：會以「111 1111」即「127」表示，並指示下八個 bytes 才載有實際的內容長度
+				masks = data[10:14]			# 簡單來說就是 Payload Len 將 Extend 額外 8 個 Byte ( ...|payload size|extend payload length 8 Bytes|... )
 				pData = data[14:]
-			else:
-				masks = data[2:6]
+			else:							# 0 byte 至 125 bytes：會以 000 0000 至 111 1101 表示，並代表下一個 byte 即為 frame 內容的開始
+				masks = data[2:6]			# 簡單來說就是 Payload Len 將 Extend 額外 8 個 Byte ( ...|payload size|data frame|... )
 				pData = data[6:]
 			
 			# 使用 Mask 解析出文字, ord() 取一個Byte的 ANSCII 十進位
@@ -89,7 +89,7 @@ def server_push_processor(con):
 		time.sleep(1)
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
-sock.bind(("", 80))
+sock.bind(("", 3333))
 sock.listen(10)
 
 while True:
