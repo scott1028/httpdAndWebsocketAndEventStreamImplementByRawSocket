@@ -88,7 +88,7 @@ def server_push_processor(con):
 		web_socket_data_frame_send_processor('我收到了!',con)
 		time.sleep(1)
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.bind(("", 3333))
 sock.listen(10)
 
