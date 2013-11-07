@@ -23,8 +23,8 @@ def web_socket_handle(con):
 	con.send('Upgrade: websocket\r\n')
 	con.send('Connection: Upgrade\r\n')
 	con.send('Sec-WebSocket-Accept: '+SWSA+'\r\n')
-	con.send('Sec-WebSocket-Origin: null\r\n')
-	con.send('Sec-WebSocket-Location: ws://'+host+'/\r\n\r\n')
+	con.send('Sec-WebSocket-Origin: null\r\n\r\n')
+	#con.send('Sec-WebSocket-Location: ws://'+host+'/\r\n\r\n')		# 這部分可以不寫
 
 # 處裡接收資料
 def web_socket_data_frame_recv_processor(con):
@@ -89,7 +89,7 @@ def server_push_processor(con):
 		time.sleep(1)
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.bind(("", 3333))
+sock.bind(("", 8888))
 sock.listen(10)
 
 while True:
