@@ -20,12 +20,23 @@ while True:
         while True:
             time.sleep(3)
             con.send('data: test\n\n')
+            con.send('data: {\n')
+            con.send('data: timestamp: ' + str(time.time()) +'\n')
+            con.send('data: }\n\n')
         con.close()
     except:
         pass
 
 sock.close()
 
+# [說明]
 # Open Your Browser visit: http://127.0.0.1:9999
 # 就可以看到非常類似 Ajax Polling 的效果！
 # 或著使用 socket_implement_eventStream_SSE.html 再打開 Console 來看 Log！
+# 
+# [傳輸資料的格式]
+# 如果要傳送 JSON 格式的資料，可以這樣寫：
+# data: {\n
+# data: "msg": "hello world",\n
+# data: "id": 12345\n
+# data: }\n\n
