@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<pre id="log"></pre>
+<script>
+    var source = new EventSource('http://localhost:9999');
+    source.addEventListener('message', function(e) {
+        console.log(e.data);
+    }, false);
+
+    source.addEventListener('open', function(e) {
+        // 連線已建立
+    }, false);
+
+    source.addEventListener('error', function(e) {
+        if (e.readyState == EventSource.CLOSED) {
+            // 連線已關閉
+        }
+    }, false);
+</script>
