@@ -47,3 +47,7 @@ sock.close()
 # [已知情況]
 # 斷線回自動連線！
 # 斷線過程中沒收到的資料在重新連線之後也會不會重送，也就是會 Miss 斷線過程中的資料！
+
+# [nc + tail]
+# 甚至可以把 "data: " 去除直接用瀏覽器開啟！
+# ex: (echo -e 'HTTP/1.1 200 OK\nAccess-Control-Allow-Origin: *\nContent-type: text/event-stream\n' && tail -f /var/www/xxx/xxx/xxx/xxx/web.log) | nc -l 3000
